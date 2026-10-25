@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.crescenzi.volkswagen_launcher.theme.AppColor
 import kotlinx.coroutines.delay
 
 @Composable

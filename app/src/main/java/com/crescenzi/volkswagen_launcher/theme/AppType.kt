@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTextApi::class)
 
-package com.crescenzi.volkswagen_launcher
+package com.crescenzi.volkswagen_launcher.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -8,15 +8,20 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import com.crescenzi.volkswagen_launcher.R
 
 val GoogleSansFlex = FontFamily(
-    Font(R.font.google_sans_flex, FontWeight.Normal,
+    Font(
+        R.font.google_sans_flex, FontWeight.Normal,
         variationSettings = FontVariation.Settings(FontVariation.weight(400))),
-    Font(R.font.google_sans_flex, FontWeight.Medium,
+    Font(
+        R.font.google_sans_flex, FontWeight.Medium,
         variationSettings = FontVariation.Settings(FontVariation.weight(500))),
-    Font(R.font.google_sans_flex, FontWeight.SemiBold,
+    Font(
+        R.font.google_sans_flex, FontWeight.SemiBold,
         variationSettings = FontVariation.Settings(FontVariation.weight(600))),
-    Font(R.font.google_sans_flex, FontWeight.Bold,
+    Font(
+        R.font.google_sans_flex, FontWeight.Bold,
         variationSettings = FontVariation.Settings(FontVariation.weight(700))),
 )
 
