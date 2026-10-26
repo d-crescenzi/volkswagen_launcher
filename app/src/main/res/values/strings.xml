@@ -12,6 +12,7 @@
     <string name="cd_next">Successivo</string>
     <string name="cd_pause">Pausa</string>
     <string name="cd_play">Play</string>
+    <string name="cd_volume">Volume</string>
 
     <string name="media_no_access_title">Controllo musica non attivo</string>
     <string name="media_no_access_hint">Tocca per abilitare l\'accesso alle notifiche</string>

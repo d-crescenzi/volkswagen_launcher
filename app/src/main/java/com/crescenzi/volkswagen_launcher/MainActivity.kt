@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -69,6 +70,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -144,12 +147,42 @@ private fun Root() {
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
             HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
                 when (page) {
-                    0 -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        MediaPanel(modifier = Modifier.fillMaxWidth())
+                    0 -> Box(Modifier.fillMaxSize()) {
+                        MediaPanel(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.Center)
+                        )
+                        VolumeSlider(
+                            modifier = Modifier
+                                .fillMaxHeight(0.78f)
+                                .align(Alignment.CenterStart)
+                        )
                     }
                     else -> AppsGrid(apps)
                 }
             }
+
+            // Soft lateral fades so horizontally scrolling content melts into the
+            // edges instead of showing a hard cut.
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .fillMaxHeight()
+                    .width(EDGE_FADE)
+                    .background(
+                        Brush.horizontalGradient(listOf(AppColor.Background, Color.Transparent))
+                    )
+            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .fillMaxHeight()
+                    .width(EDGE_FADE)
+                    .background(
+                        Brush.horizontalGradient(listOf(Color.Transparent, AppColor.Background))
+                    )
+            )
         }
 
         PageIndicator(
@@ -268,6 +301,8 @@ private fun PageIndicator(pagerState: PagerState, modifier: Modifier = Modifier)
         }
     }
 }
+
+private val EDGE_FADE = 36.dp
 
 data class LaunchApp(
     val label: String,
