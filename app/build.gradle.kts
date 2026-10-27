@@ -1,8 +1,16 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
+}
+
+val keystoreProperties = Properties().apply {
+    val keystorePropertiesFile = rootProject.file("app/keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
 }
 
 android {
@@ -17,7 +25,19 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("volkswagen") {
+            storeFile = file(keystoreProperties.getProperty("storeFile"))
+            storePassword = keystoreProperties.getProperty("storePassword")
+            keyAlias = keystoreProperties.getProperty("keyAlias")
+            keyPassword = keystoreProperties.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("volkswagen")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
@@ -25,8 +45,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // Signed with the standard Android debug keystore (~/.android/debug.keystore)
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("volkswagen")
         }
     }
 
