@@ -102,6 +102,31 @@ com.crescenzi.volkswagen_launcher
 - Chiavi di firma in `app/keystore.properties` (referenziato da `app/build.gradle.kts`), usato sia
   per debug che per release. Non reintrodurre credenziali hardcodate nel `build.gradle.kts`.
 
+## Mock della UI media (sviluppo, mai committato)
+
+Il pannello now-playing (titolo, artista, progress, transport) si vede **solo** con una
+`MediaSession` di sistema attiva e l'accesso alle notifiche concesso (vedi `MediaPanel` /
+`core/SystemActions.hasNotificationAccess`). Per lavorare sulla UI senza dipendere da un player
+esterno si usa un mock **temporaneo**, che non va mai committato.
+
+Come si fa:
+
+1. **Traccia audio** in `res/raw/` generata con ffmpeg (niente file di terzi), es. 3 minuti:
+   ```bash
+   ffmpeg -f lavfi -i "sine=frequency=220:duration=180" -af "volume=0.18" \
+     -c:a libmp3lame -b:a 128k app/src/main/res/raw/mock_track.mp3
+   ```
+2. **File mock** `presentation/media/MockMedia.kt` con un `MockMediaPanel` che: fa partire un
+   `MediaPlayer.create(ctx, R.raw.mock_track)` in loop in un `DisposableEffect`, tiene `isPlaying`
+   e `position` (polling), legge `duration` dal player, e **ridisegna lo stesso layout di
+   `MediaControls`** con metadati finti. Transport: play/pause sul player, prev/next `seekTo(0)`.
+3. **Flag** `const val MOCK_MEDIA = true` nel file mock — **senza** guard su `BuildConfig.DEBUG`,
+   così il mock resta attivo anche nell'APK release installato via pennetta.
+4. **Swap** in `LauncherScreen`: `if (MOCK_MEDIA) MockMediaPanel(...) else MediaPanel(...)`.
+
+A fine lavoro si **rimuove tutto**: cancellare `MockMedia.kt` e `res/raw/mock_track.mp3`, e
+ripristinare `MediaPanel(...)` in `LauncherScreen`. Mock e traccia non entrano mai in git.
+
 ## Stile commenti
 
 Commenti solo dove servono: corti, in inglese, mai eccessivi. Il default è **nessun commento**: il
