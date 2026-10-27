@@ -10,15 +10,13 @@
     <string name="cd_settings">Impostazioni Android</string>
     <string name="cd_prev">Precedente</string>
     <string name="cd_next">Successivo</string>
-    <string name="cd_pause">Pausa</string>
-    <string name="cd_play">Play</string>
     <string name="cd_volume">Volume</string>
 
-    <string name="media_no_access_title">Controllo musica non attivo</string>
-    <string name="media_no_access_hint">Tocca per abilitare l\'accesso alle notifiche</string>
-    <string name="media_enable">Abilita</string>
-    <string name="media_idle_title">Nessuna riproduzione</string>
-    <string name="media_idle_hint">Avvia la musica sul telefono (Bluetooth)</string>
+    <string name="media_no_access_title">Non posso controllare la musica</string>
+    <string name="media_no_access_hint">Tocca per darmi l\'accesso alle notifiche</string>
+    <string name="media_enable">Attiva</string>
+    <string name="media_idle_title">Non sta suonando niente</string>
+    <string name="media_idle_hint">Fai partire la musica dal telefono via Bluetooth</string>
 
-    <string name="cannot_open">Impossibile aprire</string>
+    <string name="cannot_open">Non riesco ad aprire</string>
 </resources>
