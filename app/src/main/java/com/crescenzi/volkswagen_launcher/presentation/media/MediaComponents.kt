@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -28,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +37,7 @@ import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppDimens
 import com.crescenzi.volkswagen_launcher.widgets.CircleButton
 import com.crescenzi.volkswagen_launcher.widgets.MorphingPlayButton
+import com.crescenzi.volkswagen_launcher.widgets.WavyProgressBar
 import kotlinx.coroutines.delay
 
 @Composable
@@ -107,16 +105,12 @@ internal fun MediaControls(controller: MediaController, modifier: Modifier = Mod
         Spacer(Modifier.height(20.dp))
 
         val fraction = if (duration > 0) (position.toFloat() / duration).coerceIn(0f, 1f) else 0f
-        LinearProgressIndicator(
-            progress = { fraction },
+        WavyProgressBar(
+            progress = fraction,
+            playing = isPlaying,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(5.dp)
-                .clip(RoundedCornerShape(3.dp)),
-            color = AppColor.Primary,
-            trackColor = AppColor.Track,
-            gapSize = 0.dp,
-            drawStopIndicator = {}
+                .height(14.dp)
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(fmt(position), color = AppColor.InkMuted, fontSize = 12.sp)
