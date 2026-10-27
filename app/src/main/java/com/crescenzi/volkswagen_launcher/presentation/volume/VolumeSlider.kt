@@ -141,7 +141,7 @@ fun VolumeSlider(modifier: Modifier = Modifier) {
             val activeTop = (cy + thumbHalf + gap).coerceAtMost(size.height)
             if (activeTop < size.height) {
                 drawRoundRect(
-                    color = AppColor.Ink,
+                    color = AppColor.Primary,
                     topLeft = Offset(cx - trackW / 2f, activeTop),
                     size = Size(trackW, size.height - activeTop),
                     cornerRadius = radius
@@ -150,7 +150,7 @@ fun VolumeSlider(modifier: Modifier = Modifier) {
 
             // Expressive handle.
             drawRoundRect(
-                color = AppColor.Ink,
+                color = AppColor.Primary,
                 topLeft = Offset(cx - thumbW / 2f, cy - thumbHalf),
                 size = Size(thumbW, thumbH),
                 cornerRadius = CornerRadius(thumbHalf, thumbHalf)

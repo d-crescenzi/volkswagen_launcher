@@ -74,7 +74,7 @@ internal fun TopBar(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
-        CircleButton(Icons.Rounded.Settings, stringResource(R.string.cd_settings)) {
+        CircleButton(Icons.Rounded.Settings, stringResource(R.string.cd_settings), squircleOnPress = true) {
             ctx.safeOpen(Intent(Settings.ACTION_SETTINGS))
         }
     }

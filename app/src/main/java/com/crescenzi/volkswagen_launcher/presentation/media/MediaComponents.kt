@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.LinearProgressIndicator
@@ -41,6 +39,7 @@ import com.crescenzi.volkswagen_launcher.R
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppDimens
 import com.crescenzi.volkswagen_launcher.widgets.CircleButton
+import com.crescenzi.volkswagen_launcher.widgets.MorphingPlayButton
 import kotlinx.coroutines.delay
 
 @Composable
@@ -81,8 +80,6 @@ internal fun MediaControls(controller: MediaController, modifier: Modifier = Mod
 
     val prevCd = stringResource(R.string.cd_prev)
     val nextCd = stringResource(R.string.cd_next)
-    val pauseCd = stringResource(R.string.cd_pause)
-    val playCd = stringResource(R.string.cd_play)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,7 +113,7 @@ internal fun MediaControls(controller: MediaController, modifier: Modifier = Mod
                 .fillMaxWidth()
                 .height(5.dp)
                 .clip(RoundedCornerShape(3.dp)),
-            color = AppColor.Ink,
+            color = AppColor.Primary,
             trackColor = AppColor.Track,
             gapSize = 0.dp,
             drawStopIndicator = {}
@@ -129,20 +126,19 @@ internal fun MediaControls(controller: MediaController, modifier: Modifier = Mod
         Spacer(Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            CircleButton(Icons.Rounded.SkipPrevious, prevCd, size = AppDimens.MediaButton, iconSize = AppDimens.MediaButtonIcon) {
+            CircleButton(Icons.Rounded.SkipPrevious, prevCd, size = AppDimens.MediaButton, iconSize = AppDimens.MediaButtonIcon, squircleOnPress = true) {
                 controller.transportControls.skipToPrevious()
             }
             Spacer(Modifier.width(28.dp))
-            CircleButton(
-                icon = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                desc = if (isPlaying) pauseCd else playCd,
+            MorphingPlayButton(
+                playing = isPlaying,
                 size = AppDimens.MediaPlayButton,
                 iconSize = AppDimens.MediaPlayButtonIcon
             ) {
                 if (isPlaying) controller.transportControls.pause() else controller.transportControls.play()
             }
             Spacer(Modifier.width(28.dp))
-            CircleButton(Icons.Rounded.SkipNext, nextCd, size = AppDimens.MediaButton, iconSize = AppDimens.MediaButtonIcon) {
+            CircleButton(Icons.Rounded.SkipNext, nextCd, size = AppDimens.MediaButton, iconSize = AppDimens.MediaButtonIcon, squircleOnPress = true) {
                 controller.transportControls.skipToNext()
             }
         }

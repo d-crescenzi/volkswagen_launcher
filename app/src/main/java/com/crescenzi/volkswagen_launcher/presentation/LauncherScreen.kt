@@ -40,62 +40,66 @@ fun LauncherScreen(modifier: Modifier = Modifier) {
         if (pagerState.currentPage != 0) scope.launch { pagerState.animateScrollToPage(0) }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppColor.Background)
-            .navigationBarsPadding()
-            .padding(start = 30.dp, end = 30.dp, top = 20.dp)
-    ) {
-        TopBar()
+    Box(modifier = modifier.fillMaxSize().background(AppColor.Background)) {
+        LauncherBackdrop(Modifier.fillMaxSize())
 
-        Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
-                when (page) {
-                    0 -> Box(Modifier.fillMaxSize()) {
-                        MediaPanel(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.Center)
-                        )
-                        VolumeSlider(
-                            modifier = Modifier
-                                .fillMaxHeight(0.78f)
-                                .align(Alignment.CenterStart)
-                        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .padding(start = 30.dp, end = 30.dp, top = 20.dp)
+        ) {
+            TopBar()
+
+            Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+                    when (page) {
+                        0 -> Box(Modifier.fillMaxSize()) {
+                            MediaPanel(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.Center)
+                            )
+                            VolumeSlider(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.78f)
+                                    .align(Alignment.CenterStart)
+                                    .padding(start = 28.dp)
+                            )
+                        }
+                        else -> AppsGrid(apps = apps)
                     }
-                    else -> AppsGrid(apps = apps)
                 }
+
+                // Soft lateral fades so horizontally scrolling content melts into the
+                // edges instead of showing a hard cut.
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .fillMaxHeight()
+                        .width(EDGE_FADE)
+                        .background(
+                            Brush.horizontalGradient(listOf(AppColor.Background, Color.Transparent))
+                        )
+                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .fillMaxHeight()
+                        .width(EDGE_FADE)
+                        .background(
+                            Brush.horizontalGradient(listOf(Color.Transparent, AppColor.Background))
+                        )
+                )
             }
 
-            // Soft lateral fades so horizontally scrolling content melts into the
-            // edges instead of showing a hard cut.
-            Box(
+            PageIndicator(
+                pagerState = pagerState,
                 modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
-                    .width(EDGE_FADE)
-                    .background(
-                        Brush.horizontalGradient(listOf(AppColor.Background, Color.Transparent))
-                    )
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .fillMaxHeight()
-                    .width(EDGE_FADE)
-                    .background(
-                        Brush.horizontalGradient(listOf(Color.Transparent, AppColor.Background))
-                    )
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 6.dp, bottom = 22.dp)
             )
         }
-
-        PageIndicator(
-            pagerState = pagerState,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 6.dp, bottom = 22.dp)
-        )
     }
 }
 

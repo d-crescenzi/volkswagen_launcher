@@ -8,4 +8,7 @@ object AppColor {
     val InkMuted = Color(0xFF6B7075)
     val Circle = Color(0xFFE7E8EA)
     val Track = Color(0xFFD9DBDE)
+
+    // Apple systemBlue (light).
+    val Primary = Color(0xFF007AFF)
 }

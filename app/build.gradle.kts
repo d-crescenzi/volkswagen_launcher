@@ -80,6 +80,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.graphics:graphics-shapes:1.0.1")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
