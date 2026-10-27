@@ -1,4 +1,4 @@
-package com.crescenzi.volkswagen_launcher
+package com.crescenzi.volkswagen_launcher.service
 
 import android.service.notification.NotificationListenerService
 

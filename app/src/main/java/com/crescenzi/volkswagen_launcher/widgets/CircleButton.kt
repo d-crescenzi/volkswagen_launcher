@@ -1,4 +1,4 @@
-package com.crescenzi.volkswagen_launcher
+package com.crescenzi.volkswagen_launcher.widgets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,12 +19,13 @@ import com.crescenzi.volkswagen_launcher.theme.AppColor
 fun CircleButton(
     icon: ImageVector,
     desc: String,
+    modifier: Modifier = Modifier,
     size: Dp = 52.dp,
     iconSize: Dp = 26.dp,
     onClick: () -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(size)
             .clip(CircleShape)
             .background(AppColor.Circle)

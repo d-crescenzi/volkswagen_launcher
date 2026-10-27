@@ -1,4 +1,4 @@
-package com.crescenzi.volkswagen_launcher
+package com.crescenzi.volkswagen_launcher.presentation.volume
 
 import android.content.Context
 import android.database.ContentObserver
@@ -40,6 +40,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.crescenzi.volkswagen_launcher.R
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import kotlin.math.roundToInt
 
@@ -51,8 +52,8 @@ import kotlin.math.roundToInt
  */
 @Composable
 fun VolumeSlider(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val audio = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
+    val ctx = LocalContext.current
+    val audio = remember { ctx.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     val maxVol = remember { audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC).coerceAtLeast(1) }
 
     var vol by remember { mutableIntStateOf(audio.getStreamVolume(AudioManager.STREAM_MUSIC)) }
@@ -64,8 +65,8 @@ fun VolumeSlider(modifier: Modifier = Modifier) {
                 vol = audio.getStreamVolume(AudioManager.STREAM_MUSIC)
             }
         }
-        context.contentResolver.registerContentObserver(Settings.System.CONTENT_URI, true, observer)
-        onDispose { context.contentResolver.unregisterContentObserver(observer) }
+        ctx.contentResolver.registerContentObserver(Settings.System.CONTENT_URI, true, observer)
+        onDispose { ctx.contentResolver.unregisterContentObserver(observer) }
     }
 
     // Live drag fraction so the handle tracks the finger even between volume steps.

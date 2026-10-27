@@ -21,6 +21,4 @@
     <string name="media_idle_hint">Avvia la musica sul telefono (Bluetooth)</string>
 
     <string name="cannot_open">Impossibile aprire</string>
-    <string name="applist_saved">Lista app salvata in %1$s</string>
-    <string name="applist_failed">Export lista app non riuscito</string>
 </resources>
