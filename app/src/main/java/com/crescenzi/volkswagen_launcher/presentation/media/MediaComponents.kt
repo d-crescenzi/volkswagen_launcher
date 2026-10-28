@@ -50,7 +50,7 @@ import com.crescenzi.volkswagen_launcher.R
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppDimens
 import com.crescenzi.volkswagen_launcher.widgets.CircleButton
-import com.crescenzi.volkswagen_launcher.widgets.MorphingBadge
+import com.crescenzi.volkswagen_launcher.widgets.MediaBadge
 import com.crescenzi.volkswagen_launcher.widgets.MorphingPlayButton
 import com.crescenzi.volkswagen_launcher.widgets.WavyProgressBar
 import androidx.compose.ui.res.stringResource
@@ -226,7 +226,7 @@ internal fun CtaButton(
 @Composable
 internal fun EmptyFull(status: MediaStatus, active: Boolean, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        MorphingBadge(status.icon, size = AppDimens.MediaEmptyCircle, iconSize = AppDimens.MediaEmptyIcon)
+        MediaBadge(status.icon, size = AppDimens.MediaEmptyCircle, iconSize = AppDimens.MediaEmptyIcon)
         Spacer(Modifier.height(20.dp))
         Text(stringResource(status.titleRes), color = AppColor.current.ink, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
         Spacer(Modifier.height(8.dp))
@@ -242,7 +242,7 @@ internal fun EmptyFull(status: MediaStatus, active: Boolean, modifier: Modifier 
 @Composable
 internal fun EmptyMini(status: MediaStatus, active: Boolean, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        MorphingBadge(status.icon, size = AppDimens.MediaMiniEmptyCircle, iconSize = AppDimens.MediaMiniEmptyIcon)
+        MediaBadge(status.icon, size = AppDimens.MediaMiniEmptyCircle, iconSize = AppDimens.MediaMiniEmptyIcon)
         Spacer(Modifier.height(16.dp))
         Text(stringResource(status.shortRes), color = AppColor.current.ink, fontSize = 19.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
         status.ctaShortRes?.let { cta ->

@@ -44,10 +44,11 @@ fun LauncherScreen(dark: Boolean, onToggleTheme: () -> Unit, modifier: Modifier 
             TopBar(
                 dark = dark,
                 onToggleTheme = onToggleTheme,
-                modifier = Modifier.padding(start = 28.dp, end = 16.dp, top = 16.dp).height(AppDimens.TopBar)
+                mediaWidth = MEDIA_FULL.dp,
+                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp).height(AppDimens.TopBar)
             )
             Spacer(Modifier.height(12.dp))
-            Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth().weight(1f).padding(start = 16.dp, end = 16.dp, bottom = 32.dp)) {
                 val wMedia = MEDIA_FULL - (MEDIA_FULL - MEDIA_MINI) * p
                 // m3 carousel
                 Row(

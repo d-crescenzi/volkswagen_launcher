@@ -1,14 +1,14 @@
 package com.crescenzi.volkswagen_launcher.presentation
 
-import android.content.Intent
-import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.rounded.DarkMode
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,14 +18,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.crescenzi.volkswagen_launcher.R
 import com.crescenzi.volkswagen_launcher.core.networkTimeOffset
-import com.crescenzi.volkswagen_launcher.core.safeOpen
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppDimens
 import com.crescenzi.volkswagen_launcher.widgets.CircleButton
@@ -38,8 +37,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 @Composable
-internal fun TopBar(dark: Boolean, onToggleTheme: () -> Unit, modifier: Modifier = Modifier) {
-    val ctx = LocalContext.current
+internal fun TopBar(dark: Boolean, onToggleTheme: () -> Unit, mediaWidth: Dp, modifier: Modifier = Modifier) {
     val romeTz = remember { TimeZone.getTimeZone("Europe/Rome") }
     val hourFmt = remember { SimpleDateFormat("H", Locale.ITALIAN).apply { timeZone = romeTz } }
 
@@ -60,15 +58,23 @@ internal fun TopBar(dark: Boolean, onToggleTheme: () -> Unit, modifier: Modifier
 
     val shadow = if (dark) 0.dp else 8.dp
 
-    Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = greeting,
-            color = AppColor.current.ink,
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(1f)
-        )
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Left region mirrors the media column.
+        Box(modifier = Modifier.width(mediaWidth), contentAlignment = Alignment.CenterStart) {
+            Text(
+                text = greeting,
+                color = AppColor.current.ink,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 12.dp)
+            )
+        }
+        // Right region mirrors the apps column; the theme button centres over it.
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
             CircleButton(
                 icon = if (dark) Icons.Rounded.DarkMode else Icons.Outlined.DarkMode,
                 desc = stringResource(R.string.cd_theme),
@@ -78,16 +84,6 @@ internal fun TopBar(dark: Boolean, onToggleTheme: () -> Unit, modifier: Modifier
                 shadow = shadow,
                 onClick = onToggleTheme
             )
-            CircleButton(
-                icon = Icons.Rounded.Settings,
-                desc = stringResource(R.string.cd_settings),
-                size = AppDimens.TopButton,
-                iconSize = AppDimens.TopButtonIcon,
-                background = AppColor.current.card,
-                shadow = shadow
-            ) {
-                ctx.safeOpen(Intent(Settings.ACTION_SETTINGS))
-            }
         }
     }
 }

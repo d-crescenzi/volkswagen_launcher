@@ -1,14 +1,9 @@
 package com.crescenzi.volkswagen_launcher.widgets
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -41,32 +36,20 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.circle
 import androidx.graphics.shapes.star
 import com.crescenzi.volkswagen_launcher.theme.AppColor
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 
-private const val SPIN_MS = 12_000
-private const val MORPH_STEP_MS = 2_000
-private const val MORPH_HOLD_FRACTION = 0.35f
-private const val SETTLE_MS = 450
-private const val COAST_DEGREES = 40f
-
-// Rounded "cookie" with [points] lobes, authored around the origin with radius 1.
-private fun cookie(points: Int) = RoundedPolygon.star(
-    numVerticesPerRadius = points,
+// Playing shape: a single rounded 6-point star. Paused: a plain circle. Both carry the
+// same vertex count so the circle↔star morph matches features 1:1 and never folds.
+private val PLAY_STAR get() = RoundedPolygon.star(
+    numVerticesPerRadius = 6,
     radius = 1f,
-    innerRadius = 0.8f,
-    rounding = CornerRounding(0.5f),
-    innerRounding = CornerRounding(0.5f)
+    innerRadius = 0.65f,
+    rounding = CornerRounding(0.4f),
+    innerRounding = CornerRounding(0.4f)
 )
 
-private val PLAY_SHAPES get() = listOf(cookie(9), cookie(12), cookie(8), cookie(6), cookie(10), cookie(7))
-
 /**
- * Central transport button. While [playing] it spins and morphs through a set of
- * shapes; paused, it relaxes into a plain circle. The play/pause glyph crossfades
- * on top and stays upright. Keeps the launcher palette (Circle fill, Ink glyph).
+ * Central transport button. While [playing] it is a 6-point star filled with the accent;
+ * paused, it relaxes into a plain circle. The play/pause glyph crossfades on top.
  */
 @Composable
 fun MorphingPlayButton(
@@ -81,57 +64,21 @@ fun MorphingPlayButton(
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    val (cookieMorphs, circleMorphs) = remember {
-        val polygons = PLAY_SHAPES
-        val circle = RoundedPolygon.circle(numVertices = 12)
-        polygons.indices.map { Morph(polygons[it], polygons[(it + 1) % polygons.size]) } to
-            polygons.map { Morph(circle, it) }
-    }
+    val morph = remember { Morph(RoundedPolygon.circle(numVertices = 12), PLAY_STAR) }
 
-    // Underneath the wind-up/down: spin and morph cycle run while playing; on pause the
-    // cycle settles to a whole shape and the spin coasts to a stop while it relaxes to a circle.
-    val cycle = remember { Animatable(0f) }
-    val spin = remember { Animatable(0f) }
+    // 1 = circle (paused), 0 = star (playing).
     val circleness = remember { Animatable(if (playing) 0f else 1f) }
-
     LaunchedEffect(playing) {
-        if (playing) {
-            coroutineScope {
-                launch {
-                    circleness.animateTo(0f, spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessMediumLow))
-                }
-                launch {
-                    while (true) {
-                        spin.snapTo(spin.value % 360f)
-                        spin.animateTo(spin.value + 360f, tween(SPIN_MS, easing = LinearEasing))
-                    }
-                }
-                launch {
-                    while (true) {
-                        cycle.snapTo(cycle.value % cookieMorphs.size)
-                        cycle.animateTo(cycle.value + 1f, tween(MORPH_STEP_MS, easing = LinearEasing))
-                    }
-                }
-            }
-        } else {
-            coroutineScope {
-                launch { cycle.animateTo(ceil(cycle.value), tween(SETTLE_MS, easing = LinearOutSlowInEasing)) }
-                launch { spin.animateTo(spin.value + COAST_DEGREES, tween(SETTLE_MS, easing = LinearOutSlowInEasing)) }
-                launch { circleness.animateTo(1f, spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow)) }
-            }
-        }
+        circleness.animateTo(
+            targetValue = if (playing) 0f else 1f,
+            animationSpec = spring(
+                dampingRatio = if (playing) Spring.DampingRatioLowBouncy else Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
     }
 
-    fun badgeShape(): Shape {
-        val toCircle = circleness.value
-        return if (toCircle > 0f) {
-            MorphShape(circleMorphs[cycle.value.roundToInt() % circleMorphs.size], (1f - toCircle).coerceIn(0f, 1f))
-        } else {
-            val index = cycle.value.toInt() % cookieMorphs.size
-            val step = (cycle.value - cycle.value.toInt() - MORPH_HOLD_FRACTION) / (1f - MORPH_HOLD_FRACTION)
-            MorphShape(cookieMorphs[index], FastOutSlowInEasing.transform(step.coerceIn(0f, 1f)))
-        }
-    }
+    fun transportShape(): Shape = MorphShape(morph, (1f - circleness.value).coerceIn(0f, 1f))
 
     val pressed = remember { mutableStateOf(false) }
     val scale = animateFloatAsState(
@@ -148,7 +95,7 @@ fun MorphingPlayButton(
                 scaleX = scale.value
                 scaleY = scale.value
             }
-            // Stable circle clip for the touch area; the morphing shape spins inside it.
+            // Stable circle clip for the touch area; the shape sits inside it.
             .clip(CircleShape)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -168,14 +115,12 @@ fun MorphingPlayButton(
                 }
             }
     ) {
-        // Only the fill spins; the glyphs are siblings on top, so they stay upright.
-        // Grey when idle, Apple blue while playing — the colour read happens at draw time.
+        // Grey when idle, accent while playing — the colour read happens at draw time.
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .graphicsLayer {
-                    rotationZ = spin.value % 360f
-                    shape = badgeShape()
+                    shape = transportShape()
                     clip = true
                 }
                 .drawBehind { drawRect(lerp(fillPlaying, fillPaused, circleness.value)) }

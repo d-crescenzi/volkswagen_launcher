@@ -9,6 +9,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.graphics.shapes.Cubic
 import androidx.graphics.shapes.Morph
+import androidx.graphics.shapes.RoundedPolygon
 
 // Builds a closed Compose Path from a run of cubics. Polygons are authored around
 // the origin with radius 1, so [fitTo] maps the [-1,1] box onto [0,size].
@@ -38,6 +39,14 @@ private fun Path.fitTo(size: Size): Path {
 class MorphShape(private val morph: Morph, private val progress: Float) : Shape {
     override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
         val path = cubicsToPath { emit -> morph.forEachCubic(progress) { emit(it) } }.fitTo(size)
+        return Outline.Generic(path)
+    }
+}
+
+// Static outline of a single [polygon], fitted the same way as [MorphShape].
+class PolygonShape(private val polygon: RoundedPolygon) : Shape {
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+        val path = cubicsToPath { emit -> polygon.cubics.forEach { emit(it) } }.fitTo(size)
         return Outline.Generic(path)
     }
 }
