@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -18,12 +17,12 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.star
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 
-// Rounded 6-point star, matching the transport button's playing shape.
+// Rounded 8-point star, matching the transport button's playing shape.
 private val BADGE_SHAPE get() = RoundedPolygon.star(
-    numVerticesPerRadius = 6,
-    innerRadius = 0.65f,
-    rounding = CornerRounding(0.4f),
-    innerRounding = CornerRounding(0.4f)
+    numVerticesPerRadius = 8,
+    innerRadius = 0.8f,
+    rounding = CornerRounding(0.5f),
+    innerRounding = CornerRounding(0.5f)
 )
 
 /** Static star emblem with an upright glyph on top. The media empty-state badge. */
@@ -36,13 +35,12 @@ fun MediaBadge(
     fill: Color = AppColor.current.primary,
     glyph: Color = AppColor.current.onPrimary,
 ) {
-    val shape = remember { PolygonShape(BADGE_SHAPE) }
+    val polygon = remember { BADGE_SHAPE }
     Box(contentAlignment = Alignment.Center, modifier = modifier.size(size)) {
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .clip(shape)
-                .drawBehind { drawRect(fill) }
+                .drawBehind { drawPath(polygon.toPath(this.size), color = fill) }
         )
         Icon(icon, contentDescription = null, tint = glyph, modifier = Modifier.size(iconSize))
     }

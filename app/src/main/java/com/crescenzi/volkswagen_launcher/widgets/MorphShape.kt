@@ -2,17 +2,13 @@ package com.crescenzi.volkswagen_launcher.widgets
 
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.graphics.shapes.Cubic
 import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.RoundedPolygon
 
-// Builds a closed Compose Path from a run of cubics. Polygons are authored around
-// the origin with radius 1, so [fitTo] maps the [-1,1] box onto [0,size].
+// Builds a closed Compose Path from a run of cubics. Polygons are authored around the
+// origin with radius 1, so [fitTo] maps the [-1,1] box onto [0,size].
 private inline fun cubicsToPath(build: ((Cubic) -> Unit) -> Unit): Path {
     val path = Path()
     var first = true
@@ -35,18 +31,12 @@ private fun Path.fitTo(size: Size): Path {
     return this
 }
 
-// One frame of [morph] at [progress] (0 = start polygon, 1 = end polygon).
-class MorphShape(private val morph: Morph, private val progress: Float) : Shape {
-    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
-        val path = cubicsToPath { emit -> morph.forEachCubic(progress) { emit(it) } }.fitTo(size)
-        return Outline.Generic(path)
-    }
-}
+// Filled path for one frame of [this] morph at [progress] (0 = start, 1 = end), fitted to
+// [size] and centred on it. Meant to be drawn with drawPath (anti-aliased) rather than
+// used as a layer clip, which is hard-edged and glitches when rotated.
+fun Morph.toPath(progress: Float, size: Size): Path =
+    cubicsToPath { emit -> forEachCubic(progress) { emit(it) } }.fitTo(size)
 
-// Static outline of a single [polygon], fitted the same way as [MorphShape].
-class PolygonShape(private val polygon: RoundedPolygon) : Shape {
-    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
-        val path = cubicsToPath { emit -> polygon.cubics.forEach { emit(it) } }.fitTo(size)
-        return Outline.Generic(path)
-    }
-}
+// Filled path for a single static [this] polygon, fitted to [size].
+fun RoundedPolygon.toPath(size: Size): Path =
+    cubicsToPath { emit -> cubics.forEach { emit(it) } }.fitTo(size)
