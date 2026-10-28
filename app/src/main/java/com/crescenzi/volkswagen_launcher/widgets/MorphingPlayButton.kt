@@ -1,6 +1,7 @@
 package com.crescenzi.volkswagen_launcher.widgets
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -25,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.lerp
@@ -40,24 +43,32 @@ import androidx.graphics.shapes.star
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 private const val SPIN_MS = 12_000
+private const val MORPH_STEP_MS = 2_600
+private const val MORPH_HOLD_FRACTION = 0.4f
 
-// Playing shape: a rounded 8-point star, kept plump (high inner radius) so it fills the
-// button like the paused circle. Paused: a plain circle. Both carry the same vertex count
-// so the circle↔star morph matches features 1:1 and never folds.
-private val PLAY_STAR get() = RoundedPolygon.star(
-    numVerticesPerRadius = 8,
+// Lobe counts the star cycles through. Big jumps (not +2 steps) so the change reads on the
+// low-res car screen; a per-shape circle of the matching vertex count keeps the paused
+// relax clean.
+private val PLAY_POINTS = listOf(5, 11, 6, 12, 7, 10)
+
+// Each playing shape is a full star (high inner radius, so it stays as big as the paused
+// circle) with as many lobes as [points].
+private fun playStar(points: Int) = RoundedPolygon.star(
+    numVerticesPerRadius = points,
     radius = 1f,
-    innerRadius = 0.8f,
-    rounding = CornerRounding(0.5f),
-    innerRounding = CornerRounding(0.5f)
+    innerRadius = 0.82f,
+    rounding = CornerRounding(0.4f),
+    innerRounding = CornerRounding(0.4f)
 )
 
 /**
- * Central transport button. While [playing] it is an 8-point star filled with the accent
- * that spins steadily; paused, it relaxes into a plain circle. The play/pause glyph
- * crossfades on top.
+ * Central transport button. While [playing] it spins and morphs through a set of 8-point
+ * stars filled with the accent; paused, it relaxes into a plain circle. The play/pause
+ * glyph crossfades on top. The shape is drawn as a filled, anti-aliased path and rotated
+ * in the draw scope, never clipped — a rotating outline clip is hard-edged and glitches.
  */
 @Composable
 fun MorphingPlayButton(
@@ -72,11 +83,16 @@ fun MorphingPlayButton(
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    val morph = remember { Morph(RoundedPolygon.circle(numVertices = 16), PLAY_STAR) }
+    val (cycleMorphs, circleMorphs) = remember {
+        val polygons = PLAY_POINTS.map { playStar(it) }
+        polygons.indices.map { Morph(polygons[it], polygons[(it + 1) % polygons.size]) } to
+            PLAY_POINTS.mapIndexed { i, n -> Morph(RoundedPolygon.circle(numVertices = 2 * n), polygons[i]) }
+    }
 
-    // 1 = circle (paused), 0 = star (playing). While playing the star spins steadily.
+    // 1 = circle (paused), 0 = star (playing). While playing the star spins and cycles.
     val circleness = remember { Animatable(if (playing) 0f else 1f) }
     val spin = remember { Animatable(0f) }
+    val cycle = remember { Animatable(0f) }
     LaunchedEffect(playing) {
         if (playing) {
             coroutineScope {
@@ -89,9 +105,27 @@ fun MorphingPlayButton(
                         spin.animateTo(spin.value + 360f, tween(SPIN_MS, easing = LinearEasing))
                     }
                 }
+                launch {
+                    while (true) {
+                        cycle.snapTo(cycle.value % cycleMorphs.size)
+                        cycle.animateTo(cycle.value + 1f, tween(MORPH_STEP_MS, easing = LinearEasing))
+                    }
+                }
             }
         } else {
             circleness.animateTo(1f, spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMediumLow))
+        }
+    }
+
+    // Current frame: circle↔current star while relaxing, else the breathing cycle.
+    fun transportPath(canvas: Size): Path {
+        val toCircle = circleness.value
+        return if (toCircle > 0f) {
+            circleMorphs[cycle.value.roundToInt() % circleMorphs.size].toPath((1f - toCircle).coerceIn(0f, 1f), canvas)
+        } else {
+            val index = cycle.value.toInt() % cycleMorphs.size
+            val step = (cycle.value - cycle.value.toInt() - MORPH_HOLD_FRACTION) / (1f - MORPH_HOLD_FRACTION)
+            cycleMorphs[index].toPath(FastOutSlowInEasing.transform(step.coerceIn(0f, 1f)), canvas)
         }
     }
 
@@ -130,16 +164,13 @@ fun MorphingPlayButton(
                 }
             }
     ) {
-        // Drawn as a filled, anti-aliased path and rotated here, rather than clipping a
-        // layer: a rotating outline clip is hard-edged and shimmers on the car screen.
         // Grey when idle, accent while playing — the colour read happens at draw time.
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .drawBehind {
-                    val progress = (1f - circleness.value).coerceIn(0f, 1f)
                     rotate(spin.value % 360f) {
-                        drawPath(morph.toPath(progress, this.size), color = lerp(fillPlaying, fillPaused, circleness.value))
+                        drawPath(transportPath(this.size), color = lerp(fillPlaying, fillPaused, circleness.value))
                     }
                 }
         )
