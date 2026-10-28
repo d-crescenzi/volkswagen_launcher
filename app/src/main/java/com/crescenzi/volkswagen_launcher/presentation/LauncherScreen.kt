@@ -26,7 +26,7 @@ import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppDimens
 
 // Media-card width at p = 0 (full) and p = 1 (mini); App card takes the rest.
-private const val MEDIA_FULL = 884f
+private const val MEDIA_FULL = 896f
 private const val MEDIA_MINI = 232f
 
 @Composable
