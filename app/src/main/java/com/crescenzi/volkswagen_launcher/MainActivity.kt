@@ -7,13 +7,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.crescenzi.volkswagen_launcher.core.ThemeStore
 import com.crescenzi.volkswagen_launcher.presentation.LauncherScreen
 import com.crescenzi.volkswagen_launcher.theme.AppColor
 import com.crescenzi.volkswagen_launcher.theme.AppTheme
+import com.crescenzi.volkswagen_launcher.theme.LightPalette
+import com.crescenzi.volkswagen_launcher.theme.NightPalette
 
 class MainActivity : ComponentActivity() {
     // Ignore the system font-size setting; the launcher owns its text sizing.
@@ -26,10 +35,30 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         hideStatusBar()
+
+        val systemDark = resources.configuration.uiMode and
+            Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        val initialDark = ThemeStore.loadDark(this, fallback = systemDark)
+
         setContent {
-            AppTheme {
-                Surface(modifier = Modifier.fillMaxSize(), color = AppColor.Background) {
-                    LauncherScreen()
+            var dark by remember { mutableStateOf(initialDark) }
+
+            LaunchedEffect(dark) {
+                window.navigationBarColor =
+                    (if (dark) NightPalette else LightPalette).canvas.toArgb()
+                WindowCompat.getInsetsController(window, window.decorView)
+                    .isAppearanceLightNavigationBars = !dark
+            }
+
+            AppTheme(dark = dark) {
+                Surface(modifier = Modifier.fillMaxSize(), color = AppColor.current.canvas) {
+                    LauncherScreen(
+                        dark = dark,
+                        onToggleTheme = {
+                            dark = !dark
+                            ThemeStore.saveDark(this@MainActivity, dark)
+                        }
+                    )
                 }
             }
         }

@@ -30,8 +30,8 @@ fun WavyProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
     playing: Boolean = true,
-    color: Color = AppColor.Primary,
-    trackColor: Color = AppColor.Track,
+    color: Color = AppColor.current.primary,
+    trackColor: Color = AppColor.current.track,
     amplitude: Dp = 3.dp,
     wavelength: Dp = 18.dp,
     stroke: Dp = 4.dp

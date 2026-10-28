@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -28,9 +30,13 @@ fun CircleButton(
     icon: ImageVector,
     desc: String,
     modifier: Modifier = Modifier,
-    size: Dp = 52.dp,
-    iconSize: Dp = 26.dp,
-    squircleOnPress: Boolean = false,
+    size: Dp = 56.dp,
+    iconSize: Dp = 28.dp,
+    background: Color = AppColor.current.cardCircle,
+    tint: Color = AppColor.current.ink,
+    shadow: Dp = 0.dp,
+    enabled: Boolean = true,
+    squircleOnPress: Boolean = true,
     onClick: () -> Unit
 ) {
     val interaction = remember { MutableInteractionSource() }
@@ -46,11 +52,12 @@ fun CircleButton(
     Box(
         modifier = modifier
             .size(size)
+            .then(if (shadow > 0.dp) Modifier.shadow(shadow, shape, clip = false) else Modifier)
             .clip(shape)
-            .background(AppColor.Circle)
-            .clickable(interactionSource = interaction, indication = ripple()) { onClick() },
+            .background(background)
+            .clickable(interactionSource = interaction, indication = ripple(), enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Icon(icon, contentDescription = desc, tint = AppColor.Ink, modifier = Modifier.size(iconSize))
+        Icon(icon, contentDescription = desc, tint = tint, modifier = Modifier.size(iconSize))
     }
 }

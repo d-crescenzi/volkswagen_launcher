@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
@@ -73,6 +74,11 @@ fun MorphingPlayButton(
     modifier: Modifier = Modifier,
     size: Dp = 104.dp,
     iconSize: Dp = 58.dp,
+    fillPlaying: Color = AppColor.current.primary,
+    fillPaused: Color = AppColor.current.cardCircle,
+    glyphPlaying: Color = AppColor.current.onPrimary,
+    glyphPaused: Color = AppColor.current.ink,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     val (cookieMorphs, circleMorphs) = remember {
@@ -147,9 +153,11 @@ fun MorphingPlayButton(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
+                enabled = enabled,
                 onClick = onClick
             )
-            .pointerInput(Unit) {
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
                 awaitPointerEventScope {
                     while (true) {
                         awaitFirstDown(requireUnconsumed = false)
@@ -170,13 +178,13 @@ fun MorphingPlayButton(
                     shape = badgeShape()
                     clip = true
                 }
-                .drawBehind { drawRect(lerp(AppColor.Primary, AppColor.Circle, circleness.value)) }
+                .drawBehind { drawRect(lerp(fillPlaying, fillPaused, circleness.value)) }
         )
 
         Icon(
             imageVector = Icons.Rounded.PlayArrow,
             contentDescription = null,
-            tint = AppColor.Ink,
+            tint = glyphPaused,
             modifier = Modifier
                 .size(iconSize)
                 .graphicsLayer {
@@ -189,7 +197,7 @@ fun MorphingPlayButton(
         Icon(
             imageVector = Icons.Rounded.Pause,
             contentDescription = null,
-            tint = AppColor.Background,
+            tint = glyphPlaying,
             modifier = Modifier
                 .size(iconSize)
                 .graphicsLayer {
