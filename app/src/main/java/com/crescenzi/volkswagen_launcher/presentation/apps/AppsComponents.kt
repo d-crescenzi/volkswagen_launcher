@@ -22,7 +22,6 @@ import com.crescenzi.volkswagen_launcher.widgets.CircleButton
 internal fun AppCell(
     app: LaunchApp,
     labelAlpha: Float,
-    enabled: Boolean,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -35,7 +34,6 @@ internal fun AppCell(
             desc = app.label,
             size = AppDimens.AppCircle,
             iconSize = AppDimens.AppIcon,
-            enabled = enabled,
             onClick = onClick
         )
         Spacer(Modifier.height(8.dp))

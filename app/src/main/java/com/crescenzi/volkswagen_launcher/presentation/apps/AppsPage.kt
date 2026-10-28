@@ -33,7 +33,6 @@ private const val APPS_CONTENT = 748
 fun AppsCard(p: Float, apps: List<LaunchApp>, onExpand: () -> Unit, modifier: Modifier = Modifier) {
     val ctx = LocalContext.current
     val shape = RoundedCornerShape(AppDimens.CardRadius)
-    val cellsActive = p > 0.5f
     val labelAlpha = ((p - 0.45f) / 0.45f).coerceIn(0f, 1f)
 
     Box(
@@ -63,7 +62,7 @@ fun AppsCard(p: Float, apps: List<LaunchApp>, onExpand: () -> Unit, modifier: Mo
             apps.chunked(6).forEach { row ->
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     row.forEach { app ->
-                        AppCell(app, labelAlpha = labelAlpha, enabled = cellsActive) { ctx.safeOpen(app.launch) }
+                        AppCell(app, labelAlpha = labelAlpha) { ctx.safeOpen(app.launch) }
                     }
                 }
             }
