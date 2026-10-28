@@ -13,19 +13,19 @@ object AppDimens {
     val CardRadius = 28.dp
 
     // App launcher grid.
-    val AppCircle = 84.dp
-    val AppIcon = 44.dp
+    val AppCircle = 80.dp
+    val AppIcon = 42.dp
 
     // Media transport — full player.
     val MediaButton = 76.dp
     val MediaButtonIcon = 42.dp
-    val MediaPlayButton = 104.dp
-    val MediaPlayButtonIcon = 58.dp
+    val MediaPlayButton = 132.dp
+    val MediaPlayButtonIcon = 74.dp
 
     // Media transport — mini player.
     val MediaMiniButtonIcon = 40.dp
-    val MediaMiniPlayButton = 96.dp
-    val MediaMiniPlayButtonIcon = 54.dp
+    val MediaMiniPlayButton = 118.dp
+    val MediaMiniPlayButtonIcon = 66.dp
 
     // Media empty-state circles.
     val MediaEmptyCircle = 84.dp

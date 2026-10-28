@@ -129,8 +129,8 @@ fun MediaCard(p: Float, onCollapse: () -> Unit, modifier: Modifier = Modifier) {
         else -> MediaState.Empty(idle)
     }
 
-    val oMedia = clamp(1f - 1.8f * p)        // full player + volume fade out
-    val oMini = clamp((p - 0.5f) / 0.4f)     // mini player fades in
+    val oMedia = clamp(1f - 2.4f * p)        // full player + volume fade out (fast)
+    val oMini = clamp((p - 0.6f) / 0.3f)     // mini player fades in late
     val fullActive = p < 0.5f
     val miniActive = p > 0.5f
 
